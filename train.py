@@ -74,7 +74,7 @@ def main():
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), lr=0.0003)
 
-    epochs = 20
+    epochs = 10
     best_acc = 0.0
     save_path = './googleNet.pth'
     train_steps = len(train_loader)
