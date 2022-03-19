@@ -7,7 +7,6 @@ import torch.nn as nn
 from torchvision import transforms, datasets
 import torch.optim as optim
 from tqdm import tqdm
-
 from model import GoogLeNet
 
 
@@ -75,7 +74,7 @@ def main():
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), lr=0.0003)
 
-    epochs = 30
+    epochs = 20
     best_acc = 0.0
     save_path = './googleNet.pth'
     train_steps = len(train_loader)
