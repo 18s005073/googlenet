@@ -82,32 +82,29 @@ def main():
             optimizer.step()
 
             runing_loss += loss.item()
-            train_bar.desc = "train epoch [{}/{}] loss:{:.3f}".format(epoch+1,epochs,loss)
+            train_bar.desc = "train epoch [{}/{}] loss:{:.3f}".format(epoch + 1, epochs, loss)
 
         # 验证
         net.eval()
         acc = 0.0
         with torch.no_grad():  # 不进行梯度运算
-            val_bar = tqdm(validate_loader,file=sys.stdout)
+            val_bar = tqdm(validate_loader, file=sys.stdout)
             for val_data in val_bar:
-                val_images,val_labels = val_data
+                val_images, val_labels = val_data
                 outputs = net(val_images.to(device))
-                predict_y = torch.max(outputs,dim=1)[1]
-                acc += torch.eq(predict_y,val_labels.to(device)).sum().item()
+                predict_y = torch.max(outputs, dim=1)[1]
+                acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
 
-        val_accurate = acc/val_num
+        val_accurate = acc / val_num
         print("[epoch {}] train_loss:{:.3f} val_accurate:{:.3f}"
-              .format(epoch+1),runing_loss/train_steps,val_accurate)
+              .format(epoch + 1), runing_loss / train_steps, val_accurate)
 
-        if val_accurate>best_acc:
+        if val_accurate > best_acc:
             best_acc = val_accurate
-            torch.save(net.state_dict(),save_path)
+            torch.save(net.state_dict(), save_path)
 
     print("Finished Training")
 
+
 if __name__ == '__main__':
     main()
-
-
-
-

@@ -19,17 +19,19 @@ def main():
 
     # load image
     img_path = "../tulip.jpg"
-    assert os.path.exists(img_path), "file: '{}' dose not exist.".format(img_path)
+    assert os.path.exists(
+        img_path), "file: '{}' dose not exist.".format(img_path)
     img = Image.open(img_path)
     plt.imshow(img)
     # [N, C, H, W]
     img = data_transform(img)
     # expand batch dimension
-    img = torch.unsqueeze(img, dim=0)
+    img = torch.unsqueeze(img, dim=0)  # 对数据进行升维
 
     # read class_indict
     json_path = './class_indices.json'
-    assert os.path.exists(json_path), "file: '{}' dose not exist.".format(json_path)
+    assert os.path.exists(
+        json_path), "file: '{}' dose not exist.".format(json_path)
 
     json_file = open(json_path, "r")
     class_indict = json.load(json_file)
@@ -39,19 +41,20 @@ def main():
 
     # load model weights
     weights_path = "./googleNet.pth"
-    assert os.path.exists(weights_path), "file: '{}' dose not exist.".format(weights_path)
-    missing_keys, unexpected_keys = model.load_state_dict(torch.load(weights_path, map_location=device),
-                                                          strict=False)
+    assert os.path.exists(
+        weights_path), "file: '{}' dose not exist.".format(weights_path)
+    missing_keys, unexpected_keys = model.load_state_dict(
+        torch.load(weights_path, map_location=device), strict=False)
 
     model.eval()
     with torch.no_grad():
         # predict class
-        output = torch.squeeze(model(img.to(device))).cpu()
+        output = torch.squeeze(model(img.to(device))).cpu()  # squeeze对数据进行降维
         predict = torch.softmax(output, dim=0)
         predict_cla = torch.argmax(predict).numpy()
 
-    print_res = "class: {}   prob: {:.3}".format(class_indict[str(predict_cla)],
-                                                 predict[predict_cla].numpy())
+    print_res = "class: {}   prob: {:.3}".format(
+        class_indict[str(predict_cla)], predict[predict_cla].numpy())
     plt.title(print_res)
     for i in range(len(predict)):
         print("class: {:10}   prob: {:.3}".format(class_indict[str(i)],
