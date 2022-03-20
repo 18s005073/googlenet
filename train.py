@@ -8,6 +8,7 @@ from torchvision import transforms, datasets
 import torch.optim as optim
 from tqdm import tqdm
 from model import GoogLeNet
+from confusionMatrix import ConfusionMatrix
 
 
 def main():
@@ -38,6 +39,10 @@ def main():
     json_str = json.dumps(cla_dict, indent=4)
     with open('class_indices.json', 'w') as json_file:
         json_file.write(json_str)
+
+    #混淆矩阵
+    labels = [label for _,label in cla_dict.items()]
+    confusion = ConfusionMatrix(num_classes=5,labels=labels)
 
     batch_size = 32
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])  # number of workers
@@ -111,6 +116,12 @@ def main():
                 outputs = net(val_images.to(device))  # eval model only have last output layer
                 predict_y = torch.max(outputs, dim=1)[1]
                 acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
+                outputs = torch.softmax(outputs, dim=1)
+                outputs = torch.argmax(outputs, dim=1)
+                confusion.update(outputs.to("cpu").numpy(),val_labels.to("cpu").numpy())
+        confusion.plot()
+        confusion.summary()
+
 
         val_accurate = acc / val_num
         print('[epoch %d] train_loss: %.3f  val_accuracy: %.3f' %
